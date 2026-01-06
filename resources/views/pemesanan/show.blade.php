@@ -20,22 +20,39 @@
                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-100 px-3 py-1 rounded-full">Dipesan pada {{ $p->tanggal_pesan }}</span>
                 </div>
                 <div class="p-8">
-                    <div class="grid grid-cols-2 gap-8 mb-10">
-                        <div>
-                            <label class="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em] block mb-2">Layanan Utama</label>
-                            <p class="text-xl font-black text-slate-800 tracking-tight">{{ $p->layanan->nama_layanan ?? 'Unknown' }}</p>
-                        </div>
-                        <div class="text-right">
-                            <label class="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em] block mb-2">Jumlah Order</label>
-                            <p class="text-xl font-black text-slate-800 tracking-tight">{{ $p->jumlah }} <span class="text-sm font-medium text-slate-400">Pcs/Item</span></p>
-                        </div>
+                    <div class="space-y-6">
+                        @foreach($orderItems as $item)
+                            <div class="flex justify-between items-center p-4 bg-slate-50/50 rounded-2xl border border-slate-100 transition-hover hover:bg-white hover:shadow-md transition-all">
+                                <div>
+                                    <label class="text-[9px] uppercase font-bold text-slate-400 tracking-[0.2em] block mb-1">Layanan #{{ $loop->iteration }}</label>
+                                    <p class="text-base font-black text-slate-800 tracking-tight">{{ $item->layanan->nama_layanan ?? 'Unknown' }}</p>
+                                    <p class="text-[10px] font-bold text-slate-400">Harga Satuan: Rp {{ number_format($item->layanan->harga_per_satuan ?? 0, 0, ',', '.') }}</p>
+                                </div>
+                                <div class="text-right">
+                                    <label class="text-[9px] uppercase font-bold text-slate-400 tracking-[0.2em] block mb-1">Jumlah</label>
+                                    <p class="text-base font-black text-slate-800 tracking-tight">{{ $item->jumlah }} <span class="text-[10px] font-medium text-slate-400">Pcs</span></p>
+                                    <p class="text-[10px] font-bold text-slate-800">Subtotal: Rp {{ number_format(($item->layanan->harga_per_satuan ?? 0) * $item->jumlah, 0, ',', '.') }}</p>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
 
-                    <div class="bg-indigo-50/50 rounded-2xl p-6 border border-indigo-100/50">
-                        <label class="text-[10px] uppercase font-bold text-indigo-400 tracking-[0.2em] block mb-3">Catatan Khusus Pelanggan</label>
-                        <p class="text-sm text-slate-700 leading-relaxed font-medium italic">
-                            {{ $p->keterangan ?: 'Tidak ada catatan khusus yang disertakan dalam pesanan ini.' }}
-                        </p>
+                    <div class="mt-8 grid grid-cols-2 gap-6">
+                        <div class="bg-indigo-50/50 rounded-2xl p-6 border border-indigo-100/50">
+                            <label class="text-[10px] uppercase font-bold text-indigo-400 tracking-[0.2em] block mb-3">Catatan Khusus</label>
+                            <p class="text-sm text-slate-700 leading-relaxed font-medium italic">
+                                {{ $p->keterangan ?: 'Tidak ada catatan khusus.' }}
+                            </p>
+                        </div>
+                        <div class="bg-blue-50/50 rounded-2xl p-6 border border-blue-100/50">
+                            <label class="text-[10px] uppercase font-bold text-blue-400 tracking-[0.2em] block mb-3">Metode Pembayaran</label>
+                            <div class="flex items-center">
+                                <i data-lucide="credit-card" class="w-4 h-4 mr-3 text-blue-500"></i>
+                                <p class="text-sm text-slate-700 font-black uppercase tracking-tight">
+                                    {{ $p->metode_pembayaran ?: 'Belum ditentukan' }}
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -46,23 +63,43 @@
                         Lampiran Desain / Bukti
                     </h2>
                 </div>
-                <div class="p-8 text-center">
-                    @if ($p->bukti_pembayaran)
-                        <div class="relative group inline-block">
-                            <div class="absolute -inset-1 bg-gradient-to-r from-pink-500 to-indigo-500 rounded-[2rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
-                            <img src="{{ asset('storage/' . $p->bukti_pembayaran) }}" alt="Bukti Pembayaran"
-                                class="relative max-w-md mx-auto rounded-[1.5rem] shadow-xl border-4 border-white transform group-hover:scale-[1.02] transition-transform duration-500">
-                            <a href="{{ asset('storage/' . $p->bukti_pembayaran) }}" target="_blank"
-                                class="mt-6 inline-flex items-center px-6 py-2 bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-200 text-xs font-bold uppercase tracking-widest hover:bg-blue-700 transition-all active:scale-95">
-                                <i data-lucide="zoom-in" class="w-4 h-4 mr-2"></i> Perbesar File
-                            </a>
-                        </div>
-                    @else
-                        <div class="py-20 bg-slate-50/50 rounded-[2rem] border-4 border-dashed border-slate-200/50">
-                            <i data-lucide="image-off" class="w-16 h-16 mx-auto mb-4 text-slate-200"></i>
-                            <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Media tidak tersedia</p>
-                        </div>
-                    @endif
+                <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <label class="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em] block mb-4 text-center">Bukti Pembayaran</label>
+                        @if ($p->bukti_pembayaran)
+                            <div class="relative group block">
+                                <img src="{{ asset('storage/' . $p->bukti_pembayaran) }}" alt="Bukti Pembayaran"
+                                    class="relative w-full rounded-[1.5rem] shadow-xl border-4 border-white transform group-hover:scale-[1.02] transition-transform duration-500 min-h-[200px] object-cover">
+                                <a href="{{ asset('storage/' . $p->bukti_pembayaran) }}" target="_blank"
+                                    class="mt-4 w-full flex items-center justify-center px-6 py-2 bg-slate-100 text-slate-600 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-slate-200 transition-all">
+                                    <i data-lucide="external-link" class="w-3 h-3 mr-2"></i> Lihat Full View
+                                </a>
+                            </div>
+                        @else
+                            <div class="py-12 bg-slate-50/50 rounded-[2rem] border-4 border-dashed border-slate-200/50 flex flex-col items-center justify-center">
+                                <i data-lucide="image-off" class="w-10 h-10 mb-2 text-slate-200"></i>
+                                <p class="text-slate-400 font-bold uppercase tracking-widest text-[8px]">Tidak ada bukti</p>
+                            </div>
+                        @endif
+                    </div>
+                    <div>
+                        <label class="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em] block mb-4 text-center">Foto Desain</label>
+                        @if ($p->foto_desain)
+                            <div class="relative group block">
+                                <img src="{{ asset('storage/' . $p->foto_desain) }}" alt="Foto Desain"
+                                    class="relative w-full rounded-[1.5rem] shadow-xl border-4 border-white transform group-hover:scale-[1.02] transition-transform duration-500 min-h-[200px] object-cover">
+                                <a href="{{ asset('storage/' . $p->foto_desain) }}" target="_blank"
+                                    class="mt-4 w-full flex items-center justify-center px-6 py-2 bg-slate-100 text-slate-600 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-slate-200 transition-all">
+                                    <i data-lucide="external-link" class="w-3 h-3 mr-2"></i> Lihat Full View
+                                </a>
+                            </div>
+                        @else
+                            <div class="py-12 bg-slate-50/50 rounded-[2rem] border-4 border-dashed border-slate-200/50 flex flex-col items-center justify-center">
+                                <i data-lucide="camera-off" class="w-10 h-10 mb-2 text-slate-200"></i>
+                                <p class="text-slate-400 font-bold uppercase tracking-widest text-[8px]">Tidak ada desain</p>
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>

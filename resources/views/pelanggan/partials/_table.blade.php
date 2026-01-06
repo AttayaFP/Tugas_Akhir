@@ -29,6 +29,12 @@
                     <i data-lucide="mail" class="w-3.5 h-3.5 opacity-50"></i>
                     {{ $p->email }}
                 </div>
+                @if($p->alamat)
+                <div class="flex items-start gap-2 text-slate-400 font-medium text-[10px] mt-1 max-w-[200px]">
+                    <i data-lucide="map-pin" class="w-3 h-3 mt-0.5 opacity-50 shrink-0"></i>
+                    <span class="line-clamp-2">{{ $p->alamat }}</span>
+                </div>
+                @endif
             </div>
         </td>
         <td class="px-6 py-5">
@@ -59,6 +65,11 @@
                 {{ $p->kategori_pelanggan }}
             </div>
             <div class="text-[10px] font-mono text-slate-400 mt-1.5 ml-1">{{ $p->kode_member ?? '-' }}</div>
+            <div class="mt-2 group-hover:opacity-100 opacity-0 transition-opacity">
+                <a href="{{ route('pelanggan.edit', $p->id) }}" class="text-[9px] font-bold text-indigo-500 hover:text-indigo-700 flex items-center gap-1">
+                    <i data-lucide="key" class="w-2.5 h-2.5"></i> GANTI PASSWORD
+                </a>
+            </div>
         </td>
         <td class="px-6 py-5 text-right">
             <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-x-4 group-hover:translate-x-0">

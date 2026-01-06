@@ -9,13 +9,38 @@
             <div class="text-xs text-slate-400">{{ $p->pelanggan->no_telepon ?? '-' }}</div>
         </td>
         <td class="px-6 py-4">
-            <div class="text-slate-900">{{ $p->layanan->nama_layanan ?? 'Unknown' }}</div>
-            <div class="text-xs text-slate-500">Qty: {{ $p->jumlah }} | Bukti:
-                {{ $p->bukti_pembayaran ? 'Ada' : 'Tidak' }}</div>
+            @php
+                $itemCount = \App\Models\Pemesanan::where('no_nota', $p->no_nota)->count();
+            @endphp
+            <div class="text-slate-900 font-bold">
+                @if($itemCount > 1)
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-700 mr-1">
+                        {{ $itemCount }} LAYANAN
+                    </span>
+                @endif
+                {{ $p->layanan->nama_layanan ?? 'Unknown' }}
+            </div>
+            <div class="text-xs text-slate-500">
+                @if($itemCount > 1)
+                    & item lainnya...
+                @else
+                    Qty: {{ $p->jumlah }} 
+                @endif
+                | Bukti: {{ $p->bukti_pembayaran ? 'Ada' : 'Tidak' }}
+                @if($p->foto_desain)
+                    <span class="ml-1 inline-flex items-center text-blue-500 font-bold">
+                        <i data-lucide="image" class="w-3 h-3 mr-0.5"></i> Desain
+                    </span>
+                @endif
+            </div>
         </td>
         <td class="px-6 py-4">
-            <div class="font-bold text-slate-800">Rp {{ number_format($p->total_harga, 0, ',', '.') }}
+            @php
+                $totalNota = \App\Models\Pemesanan::where('no_nota', $p->no_nota)->sum('total_harga');
+            @endphp
+            <div class="font-bold text-slate-800">Rp {{ number_format($totalNota, 0, ',', '.') }}
             </div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Metode: <span class="font-bold text-slate-500 capitalize">{{ $p->metode_pembayaran ?: '-' }}</span></div>
             <div class="mt-2 flex items-center gap-2">
                 @if ($p->status_pembayaran == 'Lunas')
                     <span

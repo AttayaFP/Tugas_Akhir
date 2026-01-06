@@ -114,7 +114,12 @@
                             <td class="px-6 py-4 font-medium text-slate-900">{{ $order->no_nota }}</td>
                             <td class="px-6 py-4">{{ $order->pelanggan->nama_lengkap }}</td>
                             <td class="px-6 py-4">{{ $order->layanan->nama_layanan }}</td>
-                            <td class="px-6 py-4">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</td>
+                            <td class="px-6 py-4">
+                                @php
+                                    $totalNotaDash = \App\Models\Pemesanan::where('no_nota', $order->no_nota)->sum('total_harga');
+                                @endphp
+                                Rp {{ number_format($totalNotaDash, 0, ',', '.') }}
+                            </td>
                             <td class="px-6 py-4">
                                 @if ($order->status_pesanan == 'Selesai')
                                     <span

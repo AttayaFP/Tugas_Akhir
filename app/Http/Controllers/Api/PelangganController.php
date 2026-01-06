@@ -177,4 +177,22 @@ class PelangganController extends Controller
             'message' => 'Logout berhasil'
         ]);
     }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:pelanggans,email',
+            'password' => 'required|string|min:6',
+        ]);
+
+        $pelanggan = Pelanggan::where('email', $request->email)->first();
+
+        $pelanggan->update([
+            'password' => \Illuminate\Support\Facades\Hash::make($request->password)
+        ]);
+
+        return response()->json([
+            'message' => 'Password berhasil direset'
+        ]);
+    }
 }

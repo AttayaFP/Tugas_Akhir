@@ -14,13 +14,17 @@ Route::post('/logout', [AuthController::class, 'logoutWeb'])->name('logout');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
+        $uniqueOrders = \App\Models\Pemesanan::select('no_nota', 'total_harga', 'status_pesanan', 'id_pelanggan', 'tanggal_pesan')
+            ->get()
+            ->unique('no_nota');
+
         return view('dashboard.index', [
             'total_layanan' => \App\Models\Layanan::count(),
             'total_pelanggan' => \App\Models\Pelanggan::count(),
-            'total_pemesanan' => \App\Models\Pemesanan::count(),
-            'total_pendapatan' => \App\Models\Pemesanan::sum('total_harga'),
-            'pending_order' => \App\Models\Pemesanan::where('status_pesanan', 'Pending')->count(),
-            'recent_orders' => \App\Models\Pemesanan::with(['pelanggan', 'layanan'])->latest()->take(5)->get()
+            'total_pemesanan' => $uniqueOrders->count(),
+            'total_pendapatan' => $uniqueOrders->sum('total_harga'),
+            'pending_order' => $uniqueOrders->where('status_pesanan', 'Pending')->count(),
+            'recent_orders' => \App\Models\Pemesanan::with(['pelanggan', 'layanan'])->latest()->get()->unique('no_nota')->take(5)
         ]);
     });
 
@@ -44,7 +48,11 @@ Route::middleware('auth')->group(function () {
 
     Route::controller(\App\Http\Controllers\PemesananController::class)->prefix('pemesanan')->group(function () {
         Route::get('/', 'index')->name('pemesanan.index');
+        Route::get('/create', 'create')->name('pemesanan.create');
+        Route::post('/store', 'store')->name('pemesanan.store');
         Route::get('/{id}', 'show')->name('pemesanan.show');
+        Route::get('/{id}/edit', 'edit')->name('pemesanan.edit');
+        Route::put('/{id}/update', 'update')->name('pemesanan.update');
         Route::post('/{id}/toggle-status', 'toggleStatus')->name('pemesanan.toggle-status');
         Route::post('/{id}/mark-paid', 'markAsPaid')->name('pemesanan.mark-paid');
         Route::delete('/{id}', 'destroy')->name('pemesanan.destroy');

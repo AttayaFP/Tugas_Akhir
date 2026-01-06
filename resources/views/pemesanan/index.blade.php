@@ -64,8 +64,6 @@
             async function performAjaxSearch() {
                 const formData = new FormData(form);
                 const params = new URLSearchParams(formData);
-                
-                // Add loading effect
                 tableBody.style.opacity = '0.5';
                 tableBody.style.filter = 'blur(2px)';
 

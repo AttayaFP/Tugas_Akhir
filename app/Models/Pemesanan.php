@@ -32,6 +32,8 @@ class Pemesanan extends Model
         'total_harga',
         'status_pesanan',
         'bukti_pembayaran',
+        'foto_desain',
+        'metode_pembayaran',
         'keterangan',
         'uang_muka',
         'status_pembayaran',
