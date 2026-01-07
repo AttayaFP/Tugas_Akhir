@@ -5,7 +5,7 @@
             <i data-lucide="printer" class="w-7 h-7 text-white"></i>
         </div>
         <div class="flex flex-col">
-            <span class="text-2xl font-black text-slate-800 tracking-tight dark:text-white">DigiPrint V2</span>
+            <span class="text-2xl font-black text-slate-800 tracking-tight dark:text-white">DigiPrint</span>
             <span class="text-[10px] font-bold uppercase tracking-widest transition-colors duration-500" style="color: var(--theme-primary)">Management System</span>
         </div>
     </a>
