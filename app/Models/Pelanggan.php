@@ -17,6 +17,7 @@ class Pelanggan extends Authenticatable
         'email',
         'kode_member',
         'kategori_pelanggan',
+        'fcm_token',
         'password',
         'foto',
     ];

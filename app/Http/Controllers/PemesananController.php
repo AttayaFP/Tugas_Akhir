@@ -168,19 +168,11 @@ class PemesananController extends Controller
         }
 
         // Apply to all items in same nota
-        Pemesanan::where('no_nota', $noNota)->update($updateData);
-
-        // Send Notification if Status Changed
-        if ($mainPemesanan->status_pesanan !== $request->status_pesanan) {
-            $pelanggan = $mainPemesanan->pelanggan;
-            if ($pelanggan && $pelanggan->fcm_token) {
-                \App\Services\FcmService::sendNotification(
-                    $pelanggan->fcm_token,
-                    "Status Pesanan #{$noNota}",
-                    "Pesanan Anda sekarang statusnya: {$request->status_pesanan}"
-                );
-            }
+        $items = Pemesanan::where('no_nota', $noNota)->get();
+        foreach ($items as $item) {
+            $item->update($updateData);
         }
+
 
         return redirect()->route('pemesanan.show', $id)->with('success', "Pesanan #{$noNota} berhasil diperbarui!");
     }
@@ -211,17 +203,11 @@ class PemesananController extends Controller
         };
 
         // Update all items with same no_nota
-        Pemesanan::where('no_nota', $noNota)->update(['status_pesanan' => $nextStatus]);
-
-        // Send Notification
-        $pelanggan = $pemesanan->pelanggan;
-        if ($pelanggan && $pelanggan->fcm_token) {
-            \App\Services\FcmService::sendNotification(
-                $pelanggan->fcm_token,
-                "Status Pesanan #{$noNota}",
-                "Pesanan Anda sekarang statusnya: {$nextStatus}"
-            );
+        $items = Pemesanan::where('no_nota', $noNota)->get();
+        foreach ($items as $item) {
+            $item->update(['status_pesanan' => $nextStatus]);
         }
+
 
         return back()->with('success', 'Status pesanan #' . $noNota . ' berhasil diperbarui ke ' . $nextStatus);
     }

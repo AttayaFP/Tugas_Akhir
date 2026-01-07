@@ -72,10 +72,11 @@ class FcmService
             ->post($url, $payload);
 
         if ($response->failed()) {
-            Log::error('FCM Send Error: ' . $response->body());
+            Log::error("FCM Send Error to Token: " . substr($token, 0, 10) . "... Error: " . $response->body());
             return false;
         }
 
+        Log::info("FCM Notification sent successfully to: " . substr($token, 0, 10) . "...");
         return true;
     }
 }
