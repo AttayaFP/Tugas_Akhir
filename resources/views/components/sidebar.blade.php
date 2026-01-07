@@ -5,7 +5,7 @@
             <i data-lucide="printer" class="w-7 h-7 text-white"></i>
         </div>
         <div class="flex flex-col">
-            <span class="text-2xl font-black text-slate-800 tracking-tight dark:text-white">DigiPrint</span>
+            <span class="text-2xl font-black text-slate-800 tracking-tight dark:text-white">DigiPrint V2</span>
             <span class="text-[10px] font-bold uppercase tracking-widest transition-colors duration-500" style="color: var(--theme-primary)">Management System</span>
         </div>
     </a>
@@ -46,6 +46,17 @@
                 style="{{ request()->is('pemesanan*') ? 'background-color: var(--theme-accent); color: var(--theme-primary); font-weight: 900;' : '' }}">
                 <i data-lucide="shopping-cart" class="w-5 h-5 group-hover:scale-110 transition-transform" style="{{ request()->is('pemesanan*') ? 'color: var(--theme-primary)' : '' }}"></i>
                 <span class="mx-3 text-sm">Pemesanan</span>
+            </a>
+
+            <div class="pt-6 pb-2 px-4">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Laporan</p>
+            </div>
+
+            <a href="{{ url('/laporan') }}"
+                class="flex items-center px-4 py-3 transition-all duration-500 rounded-2xl group {{ request()->is('laporan*') ? 'glass shadow-sm border-white/40' : 'text-slate-600 hover:bg-white/50' }}"
+                style="{{ request()->is('laporan*') ? 'background-color: var(--theme-accent); color: var(--theme-primary); font-weight: 900;' : '' }}">
+                <i data-lucide="file-bar-chart" class="w-5 h-5 group-hover:scale-110 transition-transform" style="{{ request()->is('laporan*') ? 'color: var(--theme-primary)' : '' }}"></i>
+                <span class="mx-3 text-sm">Laporan</span>
             </a>
         </nav>
 

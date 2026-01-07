@@ -57,4 +57,12 @@ Route::middleware('auth')->group(function () {
         Route::post('/{id}/mark-paid', 'markAsPaid')->name('pemesanan.mark-paid');
         Route::delete('/{id}', 'destroy')->name('pemesanan.destroy');
     });
+
+    Route::controller(\App\Http\Controllers\LaporanController::class)->prefix('laporan')->group(function () {
+        Route::get('/', 'index')->name('laporan.index');
+        Route::get('/cetak-pemesanan', 'cetakPemesanan')->name('laporan.cetak-pemesanan');
+        Route::get('/cetak-pelanggan', 'cetakPelanggan')->name('laporan.cetak-pelanggan');
+        Route::get('/cetak-layanan', 'cetakLayanan')->name('laporan.cetak-layanan');
+        Route::get('/cetak-pendapatan', 'cetakPendapatan')->name('laporan.cetak-pendapatan');
+    });
 });
