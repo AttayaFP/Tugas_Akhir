@@ -87,10 +87,10 @@
                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 hover:bg-blue-200 transition">
                             <i data-lucide="refresh-cw" class="w-3 h-3 mr-1"></i> Proses
                         </span>
-                    @elseif($p->status_pesanan == 'Diambil')
+                    @elseif($p->status_pesanan == 'Dikirim')
                         <span
                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800 hover:bg-indigo-200 transition">
-                            <i data-lucide="package" class="w-4 h-4 mr-1"></i> Diambil
+                            <i data-lucide="truck" class="w-4 h-4 mr-1"></i> Dikirim
                         </span>
                     @else
                         <span

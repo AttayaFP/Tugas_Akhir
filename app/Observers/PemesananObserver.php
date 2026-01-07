@@ -47,9 +47,9 @@ class PemesananObserver
                 ],
                 Pemesanan::STATUS_PESANAN_SELESAI => [
                     'title' => "Pesanan Selesai! 🎉",
-                    'body' => "Yeay! Pesanan #{$noNota} Kakak sudah jadi. Silakan diambil atau tunggu info pengiriman ya! 🏠"
+                    'body' => "Yeay! Pesanan #{$noNota} Kakak sudah jadi. Silakan diambil ya! 🏠"
                 ],
-                Pemesanan::STATUS_PESANAN_DIAMBIL => [
+                Pemesanan::STATUS_PESANAN_DIKIRIM => [
                     'title' => "Pesanan Dikirim! 🚚",
                     'body' => "Kabar gembira! Pesanan #{$noNota} Kakak sedang dalam perjalanan menuju alamat tujuan. Ditunggu ya! ✨"
                 ],
@@ -63,6 +63,14 @@ class PemesananObserver
             $title = $msg['title'];
             $body = $msg['body'];
             $type = "STATUS_UPDATE";
+
+            // Jika status berubah menjadi 'Dikirim', jadwalkan cek 5 menit kemudian
+            if ($status === Pemesanan::STATUS_PESANAN_DIKIRIM && $statusChanged) {
+                \App\Jobs\CheckOrderDeliveryStatus::dispatch($pemesanan)
+                    ->delay(now()->addMinutes(5));
+
+                Log::info("Job follow-up dijadwalkan (5 menit) untuk Nota: {$noNota}");
+            }
 
             // Logika Khusus Penagihan (Payment Reminder)
             $sisaTagihan = $pemesanan->total_harga - $pemesanan->uang_muka;

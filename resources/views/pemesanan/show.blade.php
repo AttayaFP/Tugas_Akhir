@@ -120,9 +120,9 @@
                                     <div class="p-5 bg-gradient-to-br from-blue-400 to-indigo-500 text-white rounded-2xl font-black flex items-center justify-center shadow-lg shadow-blue-200 group-hover:scale-[1.02] active:scale-95 transition-all">
                                         <i data-lucide="refresh-cw" class="w-6 h-6 mr-3 animate-spin-slow"></i> PROSES
                                     </div>
-                                @elseif($p->status_pesanan == 'Diambil')
+                                @elseif($p->status_pesanan == 'Dikirim')
                                     <div class="p-5 bg-gradient-to-br from-purple-400 to-fuchsia-500 text-white rounded-2xl font-black flex items-center justify-center shadow-lg shadow-purple-200 group-hover:scale-[1.02] active:scale-95 transition-all">
-                                        <i data-lucide="package" class="w-6 h-6 mr-3"></i> DIAMBIL
+                                        <i data-lucide="truck" class="w-6 h-6 mr-3"></i> DIKIRIM
                                     </div>
                                 @else
                                     <div class="p-5 bg-gradient-to-br from-slate-400 to-slate-600 text-white rounded-2xl font-black flex items-center justify-center shadow-lg shadow-slate-200 group-hover:scale-[1.02] active:scale-95 transition-all">

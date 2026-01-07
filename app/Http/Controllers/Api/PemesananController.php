@@ -8,6 +8,7 @@ use App\Models\Layanan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class PemesananController extends Controller
@@ -117,6 +118,7 @@ class PemesananController extends Controller
         if (!$pemesanan) {
             return response()->json(['message' => 'Pemesanan not found'], 404);
         }
+
         $validated = $request->validate([
             'status_pesanan' => 'sometimes|required|string',
             'uang_muka' => 'sometimes|numeric|min:0',
@@ -125,54 +127,41 @@ class PemesananController extends Controller
             'bukti_pembayaran' => 'nullable|file|image|max:10240',
             'jumlah_bayar' => 'sometimes|numeric|min:0',
         ]);
+
         if ($request->hasFile('bukti_pembayaran')) {
             if ($pemesanan->bukti_pembayaran && Storage::disk('public')->exists($pemesanan->bukti_pembayaran)) {
                 Storage::disk('public')->delete($pemesanan->bukti_pembayaran);
             }
+            $validated['bukti_pembayaran'] = $request->file('bukti_pembayaran')->store('bukti-pembayaran', 'public');
+        }
 
-            $validated['bukti_pembayaran'] = $request->file('bukti_pembayaran')
-                ->store('bukti-pembayaran', 'public');
-        }
-        if (isset($validated['metode_pembayaran'])) {
-            $pemesanan->metode_pembayaran = $validated['metode_pembayaran'];
-        }
+        // Logic Pembayaran Berulang / Cicilan
         if (isset($validated['jumlah_bayar'])) {
             $jumlahBayar = $validated['jumlah_bayar'];
-            $uangMukaSebelumnya = $pemesanan->uang_muka ?? 0;
-            $uangMukaBaru = $uangMukaSebelumnya + $jumlahBayar;
+            $uangMukaBaru = ($pemesanan->uang_muka ?? 0) + $jumlahBayar;
 
             if ($uangMukaBaru > $pemesanan->total_harga) {
                 return response()->json([
                     'message' => 'Jumlah pembayaran melebihi sisa yang harus dibayar',
-                    'sisa_pembayaran' => $pemesanan->total_harga - $uangMukaSebelumnya
+                    'sisa_pembayaran' => $pemesanan->total_harga - $pemesanan->uang_muka
                 ], 422);
             }
 
             $validated['uang_muka'] = $uangMukaBaru;
-            if ($uangMukaBaru >= $pemesanan->total_harga) {
-                $validated['status_pembayaran'] = Pemesanan::STATUS_PEMBAYARAN_LUNAS;
-            } else {
-                $validated['status_pembayaran'] = Pemesanan::STATUS_PEMBAYARAN_DP;
-            }
-        } elseif (isset($validated['uang_muka'])) {
-            $totalHarga = $pemesanan->total_harga;
-            $uangMuka = $validated['uang_muka'];
-            $minDpPersen = Pemesanan::getMinDPPercentage($pemesanan->pelanggan->kategori_pelanggan);
-            $minDpNominal = $totalHarga * $minDpPersen;
-            if ($uangMuka < $minDpNominal && $uangMuka < $totalHarga) {
-                return response()->json([
-                    'message' => "Minimal uang muka untuk kategori {$pemesanan->pelanggan->kategori_pelanggan} adalah " . number_format($minDpNominal, 0, ',', '.') . " (" . ($minDpPersen * 100) . "%)"
-                ], 422);
-            }
-            if ($uangMuka >= $totalHarga) {
-                $validated['status_pembayaran'] = Pemesanan::STATUS_PEMBAYARAN_LUNAS;
-            } elseif ($uangMuka > 0) {
-                $validated['status_pembayaran'] = Pemesanan::STATUS_PEMBAYARAN_DP;
-            } else {
-                $validated['status_pembayaran'] = Pemesanan::STATUS_PEMBAYARAN_BELUM_LUNAS;
-            }
+            $validated['status_pembayaran'] = ($uangMukaBaru >= $pemesanan->total_harga)
+                ? Pemesanan::STATUS_PEMBAYARAN_LUNAS
+                : Pemesanan::STATUS_PEMBAYARAN_DP;
         }
+
+        // Update seluruh item dalam satu nota jika status berubah
+        if (isset($validated['status_pesanan'])) {
+            Pemesanan::where('no_nota', $pemesanan->no_nota)->update([
+                'status_pesanan' => $validated['status_pesanan']
+            ]);
+        }
+
         $pemesanan->update($validated);
+
         return response()->json([
             'message' => 'Pemesanan berhasil diupdate',
             'data' => $pemesanan->fresh(),
@@ -180,17 +169,28 @@ class PemesananController extends Controller
         ]);
     }
 
-
     public function hapus($id)
     {
         $pemesanan = Pemesanan::find($id);
-
         if (!$pemesanan) {
             return response()->json(['message' => 'Pemesanan not found'], 404);
         }
 
-        $pemesanan->delete();
+        // Hapus semua item dalam nota yang sama
+        Pemesanan::where('no_nota', $pemesanan->no_nota)->delete();
+        return response()->json(['message' => 'Seluruh item dalam nota berhasil dihapus']);
+    }
 
-        return response()->json(['message' => 'Pemesanan deleted successfully']);
+    /**
+     * Generate Faktur PDF untuk Mobile
+     */
+    public function faktur($id)
+    {
+        $p = Pemesanan::with(['pelanggan', 'layanan'])->findOrFail($id);
+        $items = Pemesanan::with('layanan')->where('no_nota', $p->no_nota)->get();
+
+        $pdf = Pdf::loadView('pemesanan.faktur', compact('p', 'items'));
+
+        return $pdf->stream("faktur-{$p->no_nota}.pdf");
     }
 }

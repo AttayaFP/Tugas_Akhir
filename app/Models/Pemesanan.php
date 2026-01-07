@@ -11,7 +11,7 @@ class Pemesanan extends Model
     const STATUS_PESANAN_PENDING = 'Pending';
     const STATUS_PESANAN_PROSES = 'Proses';
     const STATUS_PESANAN_SELESAI = 'Selesai';
-    const STATUS_PESANAN_DIAMBIL = 'Diambil';
+    const STATUS_PESANAN_DIKIRIM = 'Dikirim';
 
     const STATUS_PEMBAYARAN_BELUM_LUNAS = 'Belum Lunas';
     const STATUS_PEMBAYARAN_DP = 'DP';

@@ -39,5 +39,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{id}', 'detail');
         Route::put('/{id}', 'ubah');
         Route::delete('/{id}', 'hapus');
+        Route::get('/{id}/faktur', 'faktur');
     });
 });
