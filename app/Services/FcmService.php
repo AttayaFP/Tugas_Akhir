@@ -5,6 +5,7 @@ namespace App\Services;
 use Google\Client;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Client\Response;
 
 class FcmService
 {
@@ -28,15 +29,24 @@ class FcmService
         }
 
         try {
+            $authConfig = json_decode(file_get_contents($credentialsPath), true);
+            if (!$authConfig || !isset($authConfig['project_id'])) {
+                Log::error('Invalid Firebase Credentials JSON or missing project_id');
+                return null;
+            }
+
+            $this->projectId = $authConfig['project_id'];
+
             $client = new Client();
             $client->setAuthConfig($credentialsPath);
             $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
 
             $accessToken = $client->fetchAccessTokenWithAssertion();
 
-            // Get Project ID from the loaded JSON
-            $authConfig = json_decode(file_get_contents($credentialsPath), true);
-            $this->projectId = $authConfig['project_id'];
+            if (!isset($accessToken['access_token'])) {
+                Log::error('Failed to fetch access token from Google API');
+                return null;
+            }
 
             return $accessToken['access_token'];
         } catch (\Exception $e) {
@@ -45,38 +55,53 @@ class FcmService
         }
     }
 
-    public static function sendNotification($token, $title, $body, $data = [])
+    public static function sendNotification($token, $title, $body, $data = [], $extraConfig = [])
     {
         $service = new self();
         $accessToken = $service->getAccessToken();
 
         if (!$accessToken) {
+            Log::error("FCM Send Error: Could not get access token");
             return false;
         }
 
         $url = "https://fcm.googleapis.com/v1/projects/{$service->projectId}/messages:send";
 
-        $payload = [
-            'message' => [
-                'token' => $token,
-                'notification' => [
-                    'title' => $title,
-                    'body'  => $body,
-                ],
-                'data' => $data // Data must be string key-values
-            ]
-        ];
-
-        $response = Http::withToken($accessToken)
-            ->withHeaders(['Content-Type' => 'application/json'])
-            ->post($url, $payload);
-
-        if ($response->failed()) {
-            Log::error("FCM Send Error to Token: " . substr($token, 0, 10) . "... Error: " . $response->body());
-            return false;
+        // FCM V1 requires all data values to be strings
+        $formattedData = [];
+        foreach ($data as $key => $value) {
+            $formattedData[(string)$key] = (string)$value;
         }
 
-        Log::info("FCM Notification sent successfully to: " . substr($token, 0, 10) . "...");
-        return true;
+        $payload = [
+            'message' => array_merge([
+                'token' => $token,
+                'notification' => [
+                    'title' => (string)$title,
+                    'body'  => (string)$body,
+                ],
+                'data' => $formattedData
+            ], $extraConfig)
+        ];
+
+        try {
+            /** @var Response $response */
+            $response = Http::withToken($accessToken)
+                ->withHeaders(['Content-Type' => 'application/json'])
+                ->post($url, $payload);
+
+            // Defensive check against "Undefined method failed" or null response
+            if (!$response || $response->status() >= 400) {
+                $errorMsg = $response ? $response->body() : 'No response from FCM server';
+                Log::error("FCM Send Error to Token: " . substr($token, 0, 10) . "... Error: " . $errorMsg);
+                return false;
+            }
+
+            Log::info("FCM Notification sent successfully to: " . substr($token, 0, 10) . "...");
+            return true;
+        } catch (\Exception $e) {
+            Log::error("FCM Send Exception: " . $e->getMessage());
+            return false;
+        }
     }
 }
