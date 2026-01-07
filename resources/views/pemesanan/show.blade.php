@@ -148,13 +148,17 @@
                         </div>
                         
                         @if($p->status_pembayaran !== 'Lunas')
-                            <form action="{{ route('pemesanan.mark-paid', $p->id) }}" method="POST">
+                            <form action="{{ route('pemesanan.mark-paid', $p->id) }}" method="POST" class="mb-4">
                                 @csrf
                                 <button type="submit" class="w-full py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-2xl font-black shadow-xl shadow-pink-200 hover:scale-[1.02] active:scale-95 transition-all text-xs tracking-widest">
                                     LUNASKAN SEKARANG
                                 </button>
                             </form>
                         @endif
+
+                        <a href="{{ url('/api/pemesanan/' . $p->id . '/faktur') }}" target="_blank" class="w-full flex items-center justify-center py-4 bg-white text-indigo-600 rounded-2xl font-black border-2 border-indigo-100 shadow-xl shadow-indigo-50/50 hover:bg-indigo-50 hover:scale-[1.02] active:scale-95 transition-all text-xs tracking-widest">
+                            <i data-lucide="printer" class="w-4 h-4 mr-2"></i> CETAK FAKTUR PDF
+                        </a>
                     </div>
                 </div>
             </div>
