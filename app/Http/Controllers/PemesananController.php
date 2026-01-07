@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pemesanan;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PemesananController extends Controller
 {
@@ -238,5 +239,18 @@ class PemesananController extends Controller
         Pemesanan::where('no_nota', $noNota)->delete();
 
         return back()->with('success', 'Pesanan #' . $noNota . ' berhasil dihapus.');
+    }
+
+    public function faktur($id)
+    {
+        $p = Pemesanan::with(['pelanggan', 'layanan'])->findOrFail($id);
+        $orderItems = Pemesanan::with('layanan')->where('no_nota', $p->no_nota)->get();
+
+        $pdf = Pdf::loadView('pemesanan.faktur', [
+            'p' => $p,
+            'items' => $orderItems
+        ]);
+
+        return $pdf->stream("faktur-{$p->no_nota}.pdf");
     }
 }

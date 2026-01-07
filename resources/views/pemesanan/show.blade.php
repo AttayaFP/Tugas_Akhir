@@ -156,7 +156,7 @@
                             </form>
                         @endif
 
-                        <a href="{{ url('/api/pemesanan/' . $p->id . '/faktur') }}" target="_blank" class="w-full flex items-center justify-center py-4 bg-white text-indigo-600 rounded-2xl font-black border-2 border-indigo-100 shadow-xl shadow-indigo-50/50 hover:bg-indigo-50 hover:scale-[1.02] active:scale-95 transition-all text-xs tracking-widest">
+                        <a href="{{ route('pemesanan.faktur', $p->id) }}" target="_blank" class="w-full flex items-center justify-center py-4 bg-white text-indigo-600 rounded-2xl font-black border-2 border-indigo-100 shadow-xl shadow-indigo-50/50 hover:bg-indigo-50 hover:scale-[1.02] active:scale-95 transition-all text-xs tracking-widest">
                             <i data-lucide="printer" class="w-4 h-4 mr-2"></i> CETAK FAKTUR PDF
                         </a>
                     </div>

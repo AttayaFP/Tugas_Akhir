@@ -55,6 +55,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/{id}/update', 'update')->name('pemesanan.update');
         Route::post('/{id}/toggle-status', 'toggleStatus')->name('pemesanan.toggle-status');
         Route::post('/{id}/mark-paid', 'markAsPaid')->name('pemesanan.mark-paid');
+        Route::get('/{id}/faktur', 'faktur')->name('pemesanan.faktur');
         Route::delete('/{id}', 'destroy')->name('pemesanan.destroy');
     });
 
