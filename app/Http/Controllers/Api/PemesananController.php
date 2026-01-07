@@ -35,7 +35,6 @@ class PemesananController extends Controller
             'status_pembayaran' => 'nullable|string|in:Belum Lunas,DP,Lunas',
         ]);
 
-        // 1. Handle Upload Files
         $buktiPembayaranPath = $request->hasFile('bukti_pembayaran')
             ? $request->file('bukti_pembayaran')->store('bukti-pembayaran', 'public')
             : null;
@@ -45,15 +44,12 @@ class PemesananController extends Controller
             : null;
 
         $pelanggan = \App\Models\Pelanggan::find($request->id_pelanggan);
-
-        // 2. Hitung Total Seluruh Nota untuk Validasi DP
         $totalHargaNota = 0;
         foreach ($request->items as $item) {
             $layanan = Layanan::find($item['id_layanan']);
             $totalHargaNota += ($layanan->harga_per_satuan * $item['jumlah']);
         }
 
-        // 3. Validasi DP berdasarkan Total Nota
         $uangMuka = $request->uang_muka ?? 0;
         $minDpPersen = Pemesanan::getMinDPPercentage($pelanggan->kategori_pelanggan);
         $minDpNominal = $totalHargaNota * $minDpPersen;
@@ -64,7 +60,6 @@ class PemesananController extends Controller
             ], 422);
         }
 
-        // 4. Tentukan Status Pembayaran (Global per Nota)
         $statusPembayaran = Pemesanan::STATUS_PEMBAYARAN_BELUM_LUNAS;
         if ($uangMuka >= $totalHargaNota) {
             $statusPembayaran = Pemesanan::STATUS_PEMBAYARAN_LUNAS;
@@ -74,8 +69,6 @@ class PemesananController extends Controller
 
         $noNota = 'INV-' . strtoupper(Str::random(8));
         $createdRecords = [];
-
-        // 5. Simpan Data per MASING-MASING ITEM dengan benar
         foreach ($request->items as $item) {
             $layananItem = Layanan::find($item['id_layanan']);
             $itemTotal = $layananItem->harga_per_satuan * $item['jumlah'];
@@ -85,8 +78,8 @@ class PemesananController extends Controller
                 'id_pelanggan' => $request->id_pelanggan,
                 'id_layanan' => $item['id_layanan'],
                 'tanggal_pesan' => now(),
-                'jumlah' => $item['jumlah'], // DISIMPAN JUMLAH ITEM INI SAJA
-                'total_harga' => $itemTotal,   // DISIMPAN TOTAL HARGA ITEM INI SAJA
+                'jumlah' => $item['jumlah'],
+                'total_harga' => $itemTotal,
                 'status_pesanan' => $request->status_pesanan ?? Pemesanan::STATUS_PESANAN_PENDING,
                 'bukti_pembayaran' => $buktiPembayaranPath,
                 'foto_desain' => $fotoDesainPath,
@@ -130,11 +123,9 @@ class PemesananController extends Controller
             'keterangan' => 'nullable|string',
             'metode_pembayaran' => 'sometimes|string',
             'bukti_pembayaran' => 'nullable|file|image|max:10240',
-            'jumlah_bayar' => 'sometimes|numeric|min:0', // Tambahan pembayaran baru
+            'jumlah_bayar' => 'sometimes|numeric|min:0',
         ]);
-        // Handle upload bukti pembayaran baru
         if ($request->hasFile('bukti_pembayaran')) {
-            // Hapus bukti lama jika ada
             if ($pemesanan->bukti_pembayaran && Storage::disk('public')->exists($pemesanan->bukti_pembayaran)) {
                 Storage::disk('public')->delete($pemesanan->bukti_pembayaran);
             }
@@ -142,17 +133,14 @@ class PemesananController extends Controller
             $validated['bukti_pembayaran'] = $request->file('bukti_pembayaran')
                 ->store('bukti-pembayaran', 'public');
         }
-        // Update metode pembayaran jika ada pembayaran baru
         if (isset($validated['metode_pembayaran'])) {
             $pemesanan->metode_pembayaran = $validated['metode_pembayaran'];
         }
-        // Logic pembayaran angsuran
         if (isset($validated['jumlah_bayar'])) {
             $jumlahBayar = $validated['jumlah_bayar'];
             $uangMukaSebelumnya = $pemesanan->uang_muka ?? 0;
             $uangMukaBaru = $uangMukaSebelumnya + $jumlahBayar;
 
-            // Validasi: tidak boleh melebihi total harga
             if ($uangMukaBaru > $pemesanan->total_harga) {
                 return response()->json([
                     'message' => 'Jumlah pembayaran melebihi sisa yang harus dibayar',
@@ -161,16 +149,12 @@ class PemesananController extends Controller
             }
 
             $validated['uang_muka'] = $uangMukaBaru;
-
-            // Auto-update status pembayaran
             if ($uangMukaBaru >= $pemesanan->total_harga) {
                 $validated['status_pembayaran'] = Pemesanan::STATUS_PEMBAYARAN_LUNAS;
             } else {
                 $validated['status_pembayaran'] = Pemesanan::STATUS_PEMBAYARAN_DP;
             }
-        }
-        // Logic update uang_muka langsung (untuk admin)
-        elseif (isset($validated['uang_muka'])) {
+        } elseif (isset($validated['uang_muka'])) {
             $totalHarga = $pemesanan->total_harga;
             $uangMuka = $validated['uang_muka'];
             $minDpPersen = Pemesanan::getMinDPPercentage($pemesanan->pelanggan->kategori_pelanggan);

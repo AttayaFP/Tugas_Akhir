@@ -10,6 +10,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/pelanggan/login', [\App\Http\Controllers\Api\PelangganController::class, 'login']);
 Route::post('/pelanggan/register', [\App\Http\Controllers\Api\PelangganController::class, 'tambah']);
 Route::post('/pelanggan/reset-password', [\App\Http\Controllers\Api\PelangganController::class, 'resetPassword']);
+Route::post('/fcm-token', [\App\Http\Controllers\Api\NotificationController::class, 'updateToken']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
