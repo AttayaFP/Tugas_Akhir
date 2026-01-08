@@ -42,8 +42,8 @@ class CheckOrderDeliveryStatus implements ShouldQueue
 
                 FcmService::sendNotification(
                     $pelanggan->fcm_token,
-                    "Sudah Terima Paket? 📦",
-                    "Hai Kak! Pesanan #{$pemesanan->no_nota} sudah sampai belum? Jika sudah, jangan lupa tekan tombol 'Selesai' ya! 😊",
+                    "Konfirmasi Penerimaan 📋",
+                    "Hai Kak! Pesanan #{$pemesanan->no_nota} sudah diterima dengan baik? Jangan lupa tekan 'Selesai' untuk mengkonfirmasi ya! 😊",
                     [
                         'no_nota' => (string) $pemesanan->no_nota,
                         'type' => 'DELIVERY_CHECK',
