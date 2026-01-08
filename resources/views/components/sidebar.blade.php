@@ -61,12 +61,6 @@
         </nav>
 
         <div class="mt-auto pt-10 px-2 space-y-4">
-            <div class="p-4 rounded-3xl border border-white/50 transition-all duration-500" style="background: linear-gradient(to bottom right, var(--theme-accent), transparent)">
-                <h3 class="text-xs font-bold text-slate-800">Support Center</h3>
-                <p class="mt-1 text-[10px] text-slate-500 leading-relaxed font-medium">Butuh bantuan teknis? Hubungi tim pengembang.</p>
-                <button class="mt-3 w-full py-2 bg-white/80 hover:bg-white text-[10px] font-bold text-slate-700 rounded-xl transition-all shadow-sm">BANTUAN</button>
-            </div>
-
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
                 <button type="submit"
