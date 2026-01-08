@@ -8,6 +8,7 @@ use App\Models\Layanan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 
@@ -212,8 +213,23 @@ class PemesananController extends Controller
     /**
      * Generate Faktur PDF untuk Mobile
      */
-    public function faktur($id)
+    public function faktur(Request $request, $id)
     {
+        // Jika tidak ada header Authorization, coba autentikasi manual lewat token di URL
+        // Ini berguna khusus untuk akses dari browser mobile
+        if (!$request->bearerToken() && $request->has('token')) {
+            $token = $request->query('token');
+            // Cari personal access token
+            $accessToken = \Laravel\Sanctum\PersonalAccessToken::findToken($token);
+            if ($accessToken) {
+                $user = $accessToken->tokenable;
+                Auth::setUser($user); // Set user untuk request ini
+            }
+        }
+
+        // Pastikan user terautentikasi (opsional, tergantung keamanan yang Anda inginkan)
+        // if (!auth()->check()) { abort(401); }
+
         $p = Pemesanan::with(['pelanggan', 'layanan'])->findOrFail($id);
         $items = Pemesanan::with('layanan')->where('no_nota', $p->no_nota)->get();
 
