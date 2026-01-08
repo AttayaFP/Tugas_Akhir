@@ -199,7 +199,8 @@ class PemesananController extends Controller
         $nextStatus = match ($currentStatus) {
             Pemesanan::STATUS_PESANAN_PENDING => Pemesanan::STATUS_PESANAN_PROSES,
             Pemesanan::STATUS_PESANAN_PROSES  => Pemesanan::STATUS_PESANAN_DIKIRIM,
-            Pemesanan::STATUS_PESANAN_DIKIRIM => Pemesanan::STATUS_PESANAN_SELESAI,
+            Pemesanan::STATUS_PESANAN_DIKIRIM => Pemesanan::STATUS_PESANAN_SAMPAI,
+            Pemesanan::STATUS_PESANAN_SAMPAI  => Pemesanan::STATUS_PESANAN_SELESAI,
             default => Pemesanan::STATUS_PESANAN_PENDING,
         };
 

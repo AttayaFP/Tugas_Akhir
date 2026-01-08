@@ -127,6 +127,9 @@
                                 @elseif($order->status_pesanan == 'Pending')
                                     <span
                                         class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">Pending</span>
+                                @elseif($order->status_pesanan == 'Sampai')
+                                    <span
+                                        class="bg-cyan-100 text-cyan-800 text-xs font-medium px-2.5 py-0.5 rounded">Sampai</span>
                                 @else
                                     <span
                                         class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">{{ $order->status_pesanan }}</span>

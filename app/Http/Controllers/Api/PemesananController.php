@@ -155,6 +155,25 @@ class PemesananController extends Controller
 
         // Update seluruh item dalam satu nota jika status berubah
         if (isset($validated['status_pesanan'])) {
+            $user = $request->user();
+            $newStatus = $validated['status_pesanan'];
+
+            // Check if user is Admin (User model) or Pelanggan
+            $isAdmin = $user instanceof \App\Models\User;
+            $isPelanggan = $user instanceof \App\Models\Pelanggan;
+
+            if ($isAdmin && !in_array($newStatus, Pemesanan::ADMIN_ALLOWED_STATUS)) {
+                return response()->json([
+                    'message' => 'Admin hanya bisa mengubah status ke: ' . implode(', ', Pemesanan::ADMIN_ALLOWED_STATUS)
+                ], 403);
+            }
+
+            if ($isPelanggan && !in_array($newStatus, Pemesanan::PELANGGAN_ALLOWED_STATUS)) {
+                return response()->json([
+                    'message' => 'Pelanggan hanya bisa mengubah status pesanan ke: Selesai'
+                ], 403);
+            }
+
             Pemesanan::where('no_nota', $pemesanan->no_nota)->update([
                 'status_pesanan' => $validated['status_pesanan']
             ]);

@@ -33,8 +33,8 @@ class CheckOrderDeliveryStatus implements ShouldQueue
         // Refresh data dari database untuk memastikan status terbaru
         $pemesanan = $this->pemesanan->refresh();
 
-        // Jika status masih 'Dikirim' (belum diubah jadi 'Selesai' oleh pelanggan)
-        if ($pemesanan->status_pesanan === Pemesanan::STATUS_PESANAN_DIKIRIM) {
+        // Jika status masih 'Sampai' (belum diubah jadi 'Selesai' oleh pelanggan)
+        if ($pemesanan->status_pesanan === Pemesanan::STATUS_PESANAN_SAMPAI) {
             $pelanggan = $pemesanan->pelanggan;
 
             if ($pelanggan && $pelanggan->fcm_token) {

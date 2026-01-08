@@ -45,13 +45,17 @@ class PemesananObserver
                     'title' => "Sedang Dikerjakan ✨",
                     'body' => "Kabar baik! Pesanan #{$noNota} Anda kini dalam tahap pengerjaan. Kami buatkan yang terbaik! 💪"
                 ],
-                Pemesanan::STATUS_PESANAN_SELESAI => [
-                    'title' => "Pesanan Selesai! 🎉",
-                    'body' => "Yeay! Pesanan #{$noNota} Kakak sudah jadi. Silakan diambil ya! 🏠"
-                ],
                 Pemesanan::STATUS_PESANAN_DIKIRIM => [
                     'title' => "Pesanan Dikirim! 🚚",
                     'body' => "Kabar gembira! Pesanan #{$noNota} Kakak sedang dalam perjalanan menuju alamat tujuan. Ditunggu ya! ✨"
+                ],
+                Pemesanan::STATUS_PESANAN_SAMPAI => [
+                    'title' => "Paket Telah Sampai! 📦",
+                    'body' => "Paket #{$noNota} sudah sampai di tujuan! Silakan cek dan konfirmasi penerimaan dengan menekan tombol 'Selesai' jika sudah sesuai. 😊"
+                ],
+                Pemesanan::STATUS_PESANAN_SELESAI => [
+                    'title' => "Pesanan Selesai! 🎉",
+                    'body' => "Yeay! Pesanan #{$noNota} Kakak telah selesai. Terima kasih atas kepercayaan Anda! 🙏"
                 ],
             ];
 
@@ -64,8 +68,8 @@ class PemesananObserver
             $body = $msg['body'];
             $type = "STATUS_UPDATE";
 
-            // Jika status berubah menjadi 'Dikirim', jadwalkan cek 5 menit kemudian
-            if ($status === Pemesanan::STATUS_PESANAN_DIKIRIM && $statusChanged) {
+            // Jika status berubah menjadi 'Sampai', jadwalkan cek 5 menit kemudian
+            if ($status === Pemesanan::STATUS_PESANAN_SAMPAI && $statusChanged) {
                 \App\Jobs\CheckOrderDeliveryStatus::dispatch($pemesanan)
                     ->delay(now()->addMinutes(5));
 

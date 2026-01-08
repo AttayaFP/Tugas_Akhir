@@ -10,8 +10,22 @@ class Pemesanan extends Model
 
     const STATUS_PESANAN_PENDING = 'Pending';
     const STATUS_PESANAN_PROSES = 'Proses';
-    const STATUS_PESANAN_SELESAI = 'Selesai';
     const STATUS_PESANAN_DIKIRIM = 'Dikirim';
+    const STATUS_PESANAN_SAMPAI = 'Sampai';
+    const STATUS_PESANAN_SELESAI = 'Selesai';
+
+    // Status yang bisa diubah oleh Admin
+    const ADMIN_ALLOWED_STATUS = [
+        self::STATUS_PESANAN_PENDING,
+        self::STATUS_PESANAN_PROSES,
+        self::STATUS_PESANAN_DIKIRIM,
+        self::STATUS_PESANAN_SAMPAI,
+    ];
+
+    // Status yang bisa diubah oleh Pelanggan
+    const PELANGGAN_ALLOWED_STATUS = [
+        self::STATUS_PESANAN_SELESAI,
+    ];
 
     const STATUS_PEMBAYARAN_BELUM_LUNAS = 'Belum Lunas';
     const STATUS_PEMBAYARAN_DP = 'DP';

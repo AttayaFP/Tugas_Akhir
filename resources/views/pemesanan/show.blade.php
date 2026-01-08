@@ -124,6 +124,10 @@
                                     <div class="p-5 bg-gradient-to-br from-purple-400 to-fuchsia-500 text-white rounded-2xl font-black flex items-center justify-center shadow-lg shadow-purple-200 group-hover:scale-[1.02] active:scale-95 transition-all">
                                         <i data-lucide="truck" class="w-6 h-6 mr-3"></i> DIKIRIM
                                     </div>
+                                @elseif($p->status_pesanan == 'Sampai')
+                                    <div class="p-5 bg-gradient-to-br from-cyan-400 to-sky-500 text-white rounded-2xl font-black flex items-center justify-center shadow-lg shadow-cyan-200 group-hover:scale-[1.02] active:scale-95 transition-all">
+                                        <i data-lucide="package-check" class="w-6 h-6 mr-3"></i> SAMPAI
+                                    </div>
                                 @else
                                     <div class="p-5 bg-gradient-to-br from-slate-400 to-slate-600 text-white rounded-2xl font-black flex items-center justify-center shadow-lg shadow-slate-200 group-hover:scale-[1.02] active:scale-95 transition-all">
                                         <i data-lucide="clock" class="w-6 h-6 mr-3"></i> PENDING

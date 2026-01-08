@@ -92,6 +92,11 @@
                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800 hover:bg-indigo-200 transition">
                             <i data-lucide="truck" class="w-4 h-4 mr-1"></i> Dikirim
                         </span>
+                    @elseif($p->status_pesanan == 'Sampai')
+                        <span
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-800 hover:bg-cyan-200 transition">
+                            <i data-lucide="package-check" class="w-4 h-4 mr-1"></i> Sampai
+                        </span>
                     @else
                         <span
                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 hover:bg-amber-200 transition">
