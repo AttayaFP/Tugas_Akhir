@@ -219,8 +219,8 @@ class PemesananController extends Controller
         $pemesanan = Pemesanan::findOrFail($id);
         $noNota = $pemesanan->no_nota;
 
-        // Calculate total for validation if needed, but we follow the new shared total logic
-        $totalHarga = $pemesanan->total_harga; // Shared total
+        // Calculate total for validation - use SUM of all items in this nota
+        $totalHarga = Pemesanan::where('no_nota', $noNota)->sum('total_harga');
 
         // Update all items with same no_nota
         Pemesanan::where('no_nota', $noNota)->update([

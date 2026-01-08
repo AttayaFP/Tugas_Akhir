@@ -148,7 +148,10 @@
                             @else
                                 <span class="px-4 py-1.5 bg-rose-500 text-white text-[10px] font-black rounded-full shadow-lg shadow-rose-100">UNPAID</span>
                             @endif
-                            <span class="text-lg font-black text-slate-800 tracking-tighter">Rp {{ number_format($p->total_harga, 0, ',', '.') }}</span>
+                            @php
+                                $grandTotalNota = $orderItems->sum('total_harga');
+                            @endphp
+                            <span class="text-lg font-black text-slate-800 tracking-tighter">Rp {{ number_format($grandTotalNota, 0, ',', '.') }}</span>
                         </div>
                         
                         @if($p->status_pembayaran !== 'Lunas')

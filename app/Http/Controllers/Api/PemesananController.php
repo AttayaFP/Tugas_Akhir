@@ -138,19 +138,28 @@ class PemesananController extends Controller
         // Logic Pembayaran Berulang / Cicilan
         if (isset($validated['jumlah_bayar'])) {
             $jumlahBayar = $validated['jumlah_bayar'];
+
+            // Hitung Grand Total seluruh item dalam nota ini
+            $grandTotal = Pemesanan::where('no_nota', $pemesanan->no_nota)->sum('total_harga');
             $uangMukaBaru = ($pemesanan->uang_muka ?? 0) + $jumlahBayar;
 
-            if ($uangMukaBaru > $pemesanan->total_harga) {
+            if ($uangMukaBaru > $grandTotal + 0.01) { // Adding small epsilon for float comparison if needed
                 return response()->json([
                     'message' => 'Jumlah pembayaran melebihi sisa yang harus dibayar',
-                    'sisa_pembayaran' => $pemesanan->total_harga - $pemesanan->uang_muka
+                    'sisa_pembayaran' => $grandTotal - $pemesanan->uang_muka
                 ], 422);
             }
 
             $validated['uang_muka'] = $uangMukaBaru;
-            $validated['status_pembayaran'] = ($uangMukaBaru >= $pemesanan->total_harga)
+            $validated['status_pembayaran'] = ($uangMukaBaru >= $grandTotal - 0.01)
                 ? Pemesanan::STATUS_PEMBAYARAN_LUNAS
                 : Pemesanan::STATUS_PEMBAYARAN_DP;
+
+            // Update seluruh item dalam satu nota untuk data finansial
+            Pemesanan::where('no_nota', $pemesanan->no_nota)->update([
+                'uang_muka' => $validated['uang_muka'],
+                'status_pembayaran' => $validated['status_pembayaran']
+            ]);
         }
 
         // Update seluruh item dalam satu nota jika status berubah
