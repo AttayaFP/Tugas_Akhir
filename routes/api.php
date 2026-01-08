@@ -39,6 +39,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{id}', 'detail');
         Route::put('/{id}', 'ubah');
         Route::delete('/{id}', 'hapus');
-        Route::get('/{id}/faktur', 'faktur');
     });
 });
+
+// Route faktur dipindah ke luar middleware auth:sanctum agar bisa diakses mobile browser dengan token
+Route::get('pemesanan/{id}/faktur', [\App\Http\Controllers\Api\PemesananController::class, 'faktur']);
