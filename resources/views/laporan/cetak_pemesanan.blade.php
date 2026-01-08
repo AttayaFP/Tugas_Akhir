@@ -39,8 +39,12 @@
                 <th>Tanggal</th>
                 <th>Pelanggan</th>
                 <th>Layanan</th>
-                <th>Status</th>
+                <th class="text-center">Jumlah</th>
                 <th class="text-right">Total Harga</th>
+                <th class="text-right">Uang Muka</th>
+                <th>Status Pesanan</th>
+                <th>Status Bayar</th>
+                <th>Metode</th>
             </tr>
         </thead>
         <tbody>
@@ -49,14 +53,18 @@
                 <td class="text-center">{{ $index + 1 }}</td>
                 <td>{{ $item->no_nota }}</td>
                 <td>{{ \Carbon\Carbon::parse($item->tanggal_pesan)->format('d/m/Y') }}</td>
-                <td>{{ $item->pelanggan->nama ?? '-' }}</td>
+                <td>{{ $item->pelanggan->nama_lengkap ?? '-' }}</td>
                 <td>{{ $item->layanan->nama_layanan ?? '-' }}</td>
-                <td>{{ $item->status_pesanan }}</td>
+                <td class="text-center">{{ $item->jumlah }} {{ $item->layanan->satuan ?? '' }}</td>
                 <td class="text-right">Rp {{ number_format($item->total_harga, 0, ',', '.') }}</td>
+                <td class="text-right">Rp {{ number_format($item->uang_muka, 0, ',', '.') }}</td>
+                <td>{{ $item->status_pesanan }}</td>
+                <td>{{ $item->status_pembayaran }}</td>
+                <td>{{ $item->metode_pembayaran }}</td>
             </tr>
             @empty
             <tr>
-                <td colspan="7" class="text-center">Tidak ada data transaksi pada periode ini.</td>
+                <td colspan="11" class="text-center">Tidak ada data transaksi pada periode ini.</td>
             </tr>
             @endforelse
         </tbody>

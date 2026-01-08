@@ -40,7 +40,7 @@ class LaporanController extends Controller
 
     public function cetakPelanggan()
     {
-        $data = Pelanggan::orderBy('nama', 'asc')->get();
+        $data = Pelanggan::orderBy('nama_lengkap', 'asc')->get();
 
         return view('laporan.cetak_pelanggan', [
             'data' => $data
@@ -66,7 +66,7 @@ class LaporanController extends Controller
         $query = Pemesanan::select(
             DB::raw('DATE(tanggal_pesan) as date'),
             DB::raw('SUM(total_harga) as total_income'),
-            DB::raw('COUNT(id_pesanan) as total_orders')
+            DB::raw('COUNT(id) as total_orders')
         )
             ->groupBy('date')
             ->orderBy('date', 'desc');

@@ -29,7 +29,10 @@
                 <th style="width: 5%">No</th>
                 <th>Nama Layanan</th>
                 <th>Deskripsi</th>
-                <th class="text-right">Harga</th>
+                <th class="text-center">Satuan</th>
+                <th class="text-right">Harga / Satuan</th>
+                <th class="text-center">Minimal Order</th>
+                <th class="text-center">Estimasi Waktu</th>
             </tr>
         </thead>
         <tbody>
@@ -38,11 +41,14 @@
                 <td class="text-center">{{ $index + 1 }}</td>
                 <td>{{ $item->nama_layanan }}</td>
                 <td>{{ $item->deskripsi }}</td>
-                <td class="text-right">Rp {{ number_format($item->harga, 0, ',', '.') }}</td>
+                <td class="text-center">{{ $item->satuan }}</td>
+                <td class="text-right">Rp {{ number_format($item->harga_per_satuan, 0, ',', '.') }}</td>
+                <td class="text-center">{{ $item->minimal_order }} {{ $item->satuan }}</td>
+                <td class="text-center">{{ $item->estimasi_waktu }}</td>
             </tr>
             @empty
             <tr>
-                <td colspan="4" class="text-center">Belum ada data layanan.</td>
+                <td colspan="7" class="text-center">Belum ada data layanan.</td>
             </tr>
             @endforelse
         </tbody>

@@ -26,8 +26,11 @@
         <thead>
             <tr>
                 <th style="width: 5%">No</th>
+                <th>Kode Member</th>
                 <th>Nama Pelanggan</th>
+                <th>Kategori</th>
                 <th>No Telepon</th>
+                <th>Email</th>
                 <th>Alamat</th>
             </tr>
         </thead>
@@ -35,13 +38,16 @@
             @forelse($data as $index => $item)
             <tr>
                 <td class="text-center">{{ $index + 1 }}</td>
-                <td>{{ $item->nama }}</td>
+                <td>{{ $item->kode_member ?? '-' }}</td>
+                <td>{{ $item->nama_lengkap }}</td>
+                <td>{{ $item->kategori_pelanggan }}</td>
                 <td>{{ $item->no_telepon }}</td>
+                <td>{{ $item->email }}</td>
                 <td>{{ $item->alamat }}</td>
             </tr>
             @empty
             <tr>
-                <td colspan="4" class="text-center">Belum ada data pelanggan.</td>
+                <td colspan="7" class="text-center">Belum ada data pelanggan.</td>
             </tr>
             @endforelse
         </tbody>
